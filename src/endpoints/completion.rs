@@ -1,10 +1,12 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
-use crate::endpoints::{Endpoint, Response, ResponseError};
+use serde::Serialize;
+use hyper::{Body, Method, Request};
+use crate::endpoints::request::Endpoint;
 
 /// Given a prompt, the response will return one or more predicted completions,
 /// and can also return the probabilities of alternative tokens at each position.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Completion<'a> {
     /// The prompt(s) to generate completions for, encoded as a string, array of strings,
     /// array of tokens, or array of token arrays.
@@ -113,8 +115,14 @@ impl Default for Completion<'_> {
 impl Endpoint for Completion<'_> {
     const ENDPOINT: &'static str = "https://api.openai.com/v1/engines/{}/completions";
 
-    fn request(&self, engine_id: &str) -> Result<Response, ResponseError> {
-        let _endpoint = Self::ENDPOINT.replace("{}", engine_id);
-        todo!()
+    fn request(&self, engine_id: &str) -> Request<Body> {
+        let endpoint = Self::ENDPOINT.replace("{}", engine_id);
+
+        Request::builder()
+            .method(Method::GET)
+            .uri(endpoint)
+            .body(Body::from(
+                serde_json::to_string(&self).expect("Failed to serialize request")
+            )).expect("Failed to build request")
     }
 }

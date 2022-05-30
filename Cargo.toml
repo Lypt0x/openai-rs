@@ -6,3 +6,18 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+# web
+hyper = { version = "0.14.19", features = ["client", "http2"] }
+hyper-openssl = "0.9.2"
+
+# async
+tokio = { version = "1", features = ["full"] }
+futures = "0.3.21"
+
+# logger
+log = "0.4.17"
+
+# deserialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1.0.81"
