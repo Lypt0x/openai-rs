@@ -55,6 +55,12 @@ pub enum ResponseError {
     Serialization(serde_json::Error),
 }
 
+impl Response {
+    pub fn choice_response(&self) -> Option<&str> {
+        Some(self.choices.first()?.text.as_str())
+    }
+}
+
 impl Display for ResponseError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {

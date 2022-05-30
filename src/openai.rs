@@ -1,6 +1,5 @@
 use hyper_openssl::HttpsConnector;
 use crate::client::Client;
-use crate::endpoints::ResponseError;
 
 pub fn new(api_key: &str) -> Client {
     let hyper_client = hyper::Client::builder()

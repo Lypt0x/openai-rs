@@ -12,37 +12,37 @@ pub struct Completion<'a> {
     /// array of tokens, or array of token arrays.
     /// Note that `<|endoftext|>` is the document separator that the model sees during training,
     /// so if a prompt is not specified the model will generate as if from the beginning of a new document.
-    prompt: Option<Cow<'a, str>>,
+    pub prompt: Option<Cow<'a, str>>,
 
     /// The suffix that comes after a completion of inserted text.
-    suffix: Option<Cow<'a, str>>,
+    pub suffix: Option<Cow<'a, str>>,
 
     /// The maximum number of tokens to generate in the completion.
     /// The token count of your prompt plus max_tokens cannot exceed the model's context length.
     /// Most models have a context length of 2048 tokens (except for the newest models, which support 4096).
-    max_tokens: u32,
+    pub max_tokens: u32,
 
     /// What sampling temperature to use. Higher values means the model will take more risks.
     /// Try 0.9 for more creative applications, and 0 (argmax sampling) for ones with a well-defined answer.
     /// We generally recommend altering this or top_p but not both.
-    temperature: f32,
+    pub temperature: f32,
 
     /// An alternative to sampling with temperature, called nucleus sampling, where the model
     /// considers the results of the tokens with top_p probability mass. So 0.1 means only
     /// the tokens comprising the top 10% probability mass are considered.
     /// We generally recommend altering this or temperature but not both.
-    top_p: f32,
+    pub top_p: f32,
 
     /// How many completions to generate for each prompt.
     /// Note: Because this parameter generates many completions,
     /// it can quickly consume your token quota. Use carefully and ensure that
     /// you have reasonable settings for max_tokens and stop.
-    n: u32,
+    pub n: u32,
 
     /// Whether to stream back partial progress.
     /// If set, tokens will be sent as data-only server-sent events as they become available,
     /// with the stream terminated by a data: `[DONE]` message.
-    stream: bool,
+    pub stream: bool,
 
     /// Include the log probabilities on the logprobs most likely tokens, as well the chosen tokens.
     /// For example, if logprobs is 5, the API will return a list of the 5 most likely tokens.
@@ -50,23 +50,23 @@ pub struct Completion<'a> {
     /// so there may be up to logprobs+1 elements in the response.
     /// The maximum value for logprobs is 5.
     /// If you need more than this, please contact support@openai.com and describe your use case.
-    logprobs: Option<u32>,
+    pub logprobs: Option<u32>,
 
     /// Echo back the prompt in addition to the completion
-    echo: bool,
+    pub echo: bool,
 
     /// Up to 4 sequences where the API will stop generating further tokens.
     /// The returned text will not contain the stop sequence.
-    stop: Option<[char; 4]>,
+    pub stop: Option<[char; 4]>,
 
     /// Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they
     /// appear in the text so far, increasing the model's likelihood to talk about new topics.
-    presence_penalty: f32,
+    pub presence_penalty: f32,
 
     /// Number between -2.0 and 2.0.
     /// Positive values penalize new tokens based on their existing frequency in the text so far,
     /// decreasing the model's likelihood to repeat the same line verbatim.
-    frequency_penalty: f32,
+    pub frequency_penalty: f32,
 
     /// Generates `best_of` completions server-side and returns the
     /// "best" (the one with the lowest log probability per token). Results cannot be streamed.
@@ -74,7 +74,7 @@ pub struct Completion<'a> {
     /// how many to return – best_of must be greater than n.
     /// Note: Because this parameter generates many completions, it can quickly consume your token
     /// quota. Use carefully and ensure that you have reasonable settings for max_tokens and stop.
-    best_of: u32,
+    pub best_of: u32,
 
     /// Modify the likelihood of specified tokens appearing in the completion.
     /// Accepts a json object that maps tokens (specified by their token ID in the GPT tokenizer)
@@ -84,10 +84,10 @@ pub struct Completion<'a> {
     /// will vary per model, but values between -1 and 1 should decrease or increase likelihood
     /// of selection; values like -100 or 100 should result in a ban or exclusive selection
     /// of the relevant token.
-    logit_bias: Option<HashMap<Cow<'a, str>, i32>>,
+    pub logit_bias: Option<HashMap<Cow<'a, str>, i32>>,
 
     /// A unique identifier representing your end-user, which will help OpenAI to monitor and detect abuse.
-    user: Option<Cow<'a, str>>
+    pub user: Option<Cow<'a, str>>
 }
 
 impl Default for Completion<'_> {
@@ -106,8 +106,8 @@ impl Default for Completion<'_> {
             presence_penalty: 0.,
             frequency_penalty: 0.,
             best_of: 1,
-            logit_bias: None,
-            user: None
+            logit_bias: Some(HashMap::new()),
+            user: Some(Cow::Borrowed(""))
         }
     }
 }
@@ -121,13 +121,15 @@ impl Endpoint for Completion<'_> {
         engine_id: &str
     ) -> Request<Body> {
         let endpoint = Self::ENDPOINT.replace("{}", engine_id);
+        let serialized = serde_json::to_string(&self)
+            .expect("Failed to serialize request");
+        trace!("endpoint={}, serialized={}", endpoint, serialized);
 
         Request::builder()
-            .method(Method::GET)
+            .method(Method::POST)
             .uri(endpoint)
             .header(hyper::header::AUTHORIZATION, &format!("Bearer {}", auth_token))
-            .body(Body::from(
-                serde_json::to_string(&self).expect("Failed to serialize request")
-            )).expect("Failed to build request")
+            .header(hyper::header::CONTENT_TYPE, "application/json")
+            .body(Body::from(serialized)).expect("Failed to build request")
     }
 }

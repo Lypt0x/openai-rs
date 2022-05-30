@@ -23,8 +23,10 @@ impl Client {
             Ok(response) => {
                 if response.status().is_success() {
                     let body = hyper::body::to_bytes(response.into_body()).await?;
+                    let serialized = serde_json::from_slice(&body).map_err(ResponseError::from)?;
+                    trace!("Requesting: {:#?}", serialized);
 
-                    Ok(serde_json::from_slice(&body).map_err(ResponseError::from)?)
+                    Ok(serialized)
                 } else {
                     Err(ResponseError::ErrorCode(response.status()))
                 }
