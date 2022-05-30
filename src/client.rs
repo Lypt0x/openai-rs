@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use hyper::Client as HyperClient;
 use hyper::client::HttpConnector;
 use hyper_openssl::HttpsConnector;
@@ -20,7 +19,7 @@ impl Client {
         model: &T
     ) -> Result<Response, ResponseError>
         where T: Endpoint {
-        match self.https.request(model.request(engine_id)).await {
+        match self.https.request(model.request(&*self.api_key, engine_id)).await {
             Ok(response) => {
                 if response.status().is_success() {
                     let body = hyper::body::to_bytes(response.into_body()).await?;

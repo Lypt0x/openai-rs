@@ -22,7 +22,11 @@ pub(crate) mod request {
     where Self: Serialize {
         const ENDPOINT: &'static str;
 
-        fn request(&self, engine_id: &str) -> Request<Body>;
+        fn request(
+            &self,
+            auth_token: &str,
+            engine_id: &str
+        ) -> Request<Body>;
     }
 }
 

@@ -115,12 +115,17 @@ impl Default for Completion<'_> {
 impl Endpoint for Completion<'_> {
     const ENDPOINT: &'static str = "https://api.openai.com/v1/engines/{}/completions";
 
-    fn request(&self, engine_id: &str) -> Request<Body> {
+    fn request(
+        &self,
+        auth_token: &str,
+        engine_id: &str
+    ) -> Request<Body> {
         let endpoint = Self::ENDPOINT.replace("{}", engine_id);
 
         Request::builder()
             .method(Method::GET)
             .uri(endpoint)
+            .header(hyper::header::AUTHORIZATION, &format!("Bearer {}", auth_token))
             .body(Body::from(
                 serde_json::to_string(&self).expect("Failed to serialize request")
             )).expect("Failed to build request")
