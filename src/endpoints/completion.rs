@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 use serde::Serialize;
-use hyper::{Body, Method, Request};
+use hyper::{Body, Request};
 use crate::endpoints::request::Endpoint;
 
 /// Given a prompt, the response will return one or more predicted completions,
@@ -125,11 +125,6 @@ impl Endpoint for Completion<'_> {
             .expect("Failed to serialize request");
         trace!("endpoint={}, serialized={}", endpoint, serialized);
 
-        Request::builder()
-            .method(Method::POST)
-            .uri(endpoint)
-            .header(hyper::header::AUTHORIZATION, &format!("Bearer {}", auth_token))
-            .header(hyper::header::CONTENT_TYPE, "application/json")
-            .body(Body::from(serialized)).expect("Failed to build request")
+        super::request::post!(endpoint, auth_token, serialized)
     }
 }

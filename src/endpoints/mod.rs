@@ -8,6 +8,7 @@ pub mod embeddings;
 pub mod finetuning;
 pub mod qa;
 pub mod search;
+pub mod edits;
 
 use serde::Deserialize;
 
@@ -15,6 +16,18 @@ use serde::Deserialize;
 pub(crate) mod request {
     use hyper::{Body, Request};
     use serde::Serialize;
+
+    macro_rules! post {
+        ($endpoint:ident, $auth_token:ident, $serialized:ident) => {{
+            hyper::http::Request::builder()
+                .method(hyper::http::method::Method::POST)
+                .uri($endpoint)
+                .header(hyper::header::AUTHORIZATION, &format!("Bearer {}", $auth_token))
+                .header(hyper::header::CONTENT_TYPE, "application/json")
+                .body(hyper::body::Body::from($serialized)).expect("Failed to build request")
+        }}
+    }
+    pub(super) use post;
 
     /// An Endpoint-Trait which contains the ability to form a request.
     /// This trait is mainly used for internal purpose (implementation of the Endpoint-Trait)
@@ -30,7 +43,7 @@ pub(crate) mod request {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Response {
     pub id: String,
     pub object: String,
@@ -39,7 +52,7 @@ pub struct Response {
     pub choices: Vec<Choice>
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub struct Choice {
     pub text: String,
     pub index: usize,
