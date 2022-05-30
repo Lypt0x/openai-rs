@@ -1,7 +1,6 @@
 use hyper_openssl::HttpsConnector;
 use crate::client::Client;
-use crate::endpoints::{Response, ResponseError};
-use crate::endpoints::request::Endpoint;
+use crate::endpoints::ResponseError;
 
 pub fn new(api_key: &str) -> Client {
     let hyper_client = hyper::Client::builder()
@@ -12,29 +11,5 @@ pub fn new(api_key: &str) -> Client {
     Client {
         api_key: api_key.to_owned(),
         https: hyper_client,
-    }
-}
-
-impl Client {
-    pub async fn create<T>(
-        &self,
-        engine_id: &str,
-        model: &T
-    ) -> Result<Response, ResponseError>
-    where T: Endpoint {
-        match self.https.request(model.request(engine_id)).await {
-            Ok(response) => {
-                if response.status().is_success() {
-                    let body = hyper::body::to_bytes(response.into_body()).await?;
-
-                    Ok(serde_json::from_slice(&body).map_err::<ResponseError, _>(
-                            |error| error.into()
-                    )?)
-                } else {
-                    Err(ResponseError::ErrorCode(response.status()))
-                }
-            },
-            Err(error) => Err(error.into())
-        }
     }
 }
