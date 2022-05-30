@@ -38,8 +38,8 @@ impl Default for Edit<'_> {
 impl Endpoint for Edit<'_> {
     const ENDPOINT: &'static str = "https://api.openai.com/v1/engines/{}/edits";
 
-    fn request(&self, auth_token: &str, engine_id: &str) -> Request<Body> {
-        let endpoint = Self::ENDPOINT.replace("{}", engine_id);
+    fn request(&self, auth_token: &str, engine_id: Option<&str>) -> Request<Body> {
+        let endpoint = Self::ENDPOINT.replace("{}", engine_id.unwrap());
         let serialized = serde_json::to_string(&self)
             .expect("Failed to serialize Edit");
 

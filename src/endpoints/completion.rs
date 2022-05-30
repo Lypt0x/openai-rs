@@ -118,9 +118,9 @@ impl Endpoint for Completion<'_> {
     fn request(
         &self,
         auth_token: &str,
-        engine_id: &str
+        engine_id: Option<&str>
     ) -> Request<Body> {
-        let endpoint = Self::ENDPOINT.replace("{}", engine_id);
+        let endpoint = Self::ENDPOINT.replace("{}", engine_id.unwrap());
         let serialized = serde_json::to_string(&self)
             .expect("Failed to serialize request");
         trace!("endpoint={}, serialized={}", endpoint, serialized);

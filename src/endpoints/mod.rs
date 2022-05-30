@@ -38,7 +38,7 @@ pub(crate) mod request {
         fn request(
             &self,
             auth_token: &str,
-            engine_id: &str
+            engine_id: Option<&str>
         ) -> Request<Body>;
     }
 }
