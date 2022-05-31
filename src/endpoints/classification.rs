@@ -2,6 +2,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use hyper::{Body, Request};
 use serde::Serialize;
+use crate::endpoints::Model;
 use crate::endpoints::request::Endpoint;
 
 /// Given a query and a set of labeled examples, the model will predict the most likely label for the query.
@@ -75,14 +76,6 @@ pub struct Classification<'a> {
     pub user: Cow<'a, str>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub enum Model {
-    Ada,
-    Babbage,
-    Curie,
-    Davinci
-}
-
 impl Default for Classification<'_> {
     fn default() -> Self {
         Self {
@@ -101,12 +94,6 @@ impl Default for Classification<'_> {
             expand: Vec::new(),
             user: Cow::Borrowed("")
         }
-    }
-}
-
-impl Default for Model {
-    fn default() -> Self {
-        Self::Ada
     }
 }
 

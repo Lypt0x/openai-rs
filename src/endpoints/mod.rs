@@ -6,11 +6,11 @@ pub mod classification;
 pub mod code;
 pub mod embeddings;
 pub mod finetuning;
-pub mod qa;
+pub mod answer;
 pub mod search;
 pub mod edits;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// This request-Module is for internal purpose
 pub(crate) mod request {
@@ -60,12 +60,26 @@ pub struct Choice {
     pub finish_reason: String
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub enum Model {
+    Ada,
+    Babbage,
+    Curie,
+    Davinci
+}
+
 #[derive(Debug)]
 pub enum ResponseError {
     Io(Error),
     Hyper(hyper::Error),
     ErrorCode(hyper::StatusCode),
     Serialization(serde_json::Error),
+}
+
+impl Default for Model {
+    fn default() -> Self {
+        Self::Ada
+    }
 }
 
 impl Response {
