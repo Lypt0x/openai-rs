@@ -5,6 +5,7 @@ repository = "https://github.com/Lypt0x/openai-rs"
 license = "MIT"
 keywords = ["openai", "ai", "neural", "genetic", "evolutionary"]
 description = "A Rust implementation of OpenAI"
+documentation = "https://docs.rs/openai-rs"
 version = "0.1.0"
 edition = "2021"
 exclude = [
