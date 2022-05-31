@@ -42,11 +42,17 @@ pub(crate) mod request {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Response {
-    pub id: String,
-    pub object: String,
-    pub created: u64,
-    pub model: String,
-    pub choices: Vec<Choice>
+    pub id: Option<String>,
+    pub object: Option<String>,
+    pub created: Option<u64>,
+    pub model: Option<String>,
+    pub choices: Option<Vec<Choice>>,
+    pub data: Option<Vec<Data>>,
+    pub completion: Option<String>,
+    pub label: Option<String>,
+    pub search_model: Option<Model>,
+    pub selected_examples: Option<Vec<SelectedExample>>,
+    pub selected_documents: Option<Vec<SelectedDocument>>
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
@@ -54,10 +60,31 @@ pub struct Choice {
     pub text: String,
     pub index: usize,
     pub logprobs: Option<u32>,
-    pub finish_reason: String
+    pub finish_reason: Option<String>
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub struct Data {
+    pub document: u32,
+    pub object: String,
+    pub score: f32,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub struct SelectedExample {
+    pub document: u32,
+    pub label: String,
+    pub text: String
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize)]
+pub struct SelectedDocument {
+    pub document: u32,
+    pub text: String
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Model {
     Ada,
     Babbage,
@@ -81,7 +108,7 @@ impl Default for Model {
 
 impl Response {
     pub fn choice_response(&self) -> Option<&str> {
-        Some(self.choices.first()?.text.as_str())
+        Some(self.choices.as_ref()?.first()?.text.as_str())
     }
 }
 

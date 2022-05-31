@@ -52,6 +52,7 @@ impl Endpoint for Search<'_> {
         let endpoint = Self::ENDPOINT.replace("{}", engine_id.unwrap());
         let serialized = serde_json::to_string(&self)
             .expect("Failed to serialize Search");
+        trace!("endpoint={}, serialized={}", endpoint, serialized);
 
         super::request::post!(endpoint, auth_token, serialized)
     }

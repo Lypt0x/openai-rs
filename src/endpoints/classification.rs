@@ -10,7 +10,8 @@ use crate::endpoints::request::Endpoint;
 #[derive(Debug, Clone, Serialize)]
 pub struct Classification<'a> {
     /// ID of the engine to use for completion. You can select one of ada, babbage, curie, or davinci.
-    pub model: Model,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub model: Option<Model>,
 
     /// Query to be classified.
     pub query: Cow<'a, str>,
@@ -19,24 +20,29 @@ pub struct Classification<'a> {
     /// `[["The movie is so interesting.", "Positive"], ["It is quite boring.", "Negative"], ...]`
     /// All the label strings will be normalized to be capitalized.
     /// You should specify either examples or file, but not both.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub examples: Vec<[Cow<'a, str>; 2]>,
 
     /// The ID of the uploaded file that contains training examples.
     /// See upload file for how to upload a file of the desired format and purpose.
     /// You should specify either examples or file, but not both.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub file: Option<Cow<'a, str>>,
 
     /// The set of categories being classified. If not specified, candidate labels will be
     /// automatically collected from the examples you provide. All the label strings will be
     /// normalized to be capitalized.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub labels: Vec<Cow<'a, str>>,
 
     /// ID of the engine to use for Search. You can select one of ada, babbage, curie, or davinci
-    pub search_model: Model,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub search_model: Option<Model>,
 
     /// What sampling temperature to use. Higher values mean the model will take more risks.
     /// Try 0.9 for more creative applications, and 0 (argmax sampling) for ones with a well-defined answer.
-    pub temperature: f32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub temperature: Option<f32>,
 
     /// Include the log probabilities on the logprobs most likely tokens, as well the chosen tokens.
     /// For example, if logprobs is 5, the API will return a list of the 5 most likely tokens.
@@ -44,11 +50,13 @@ pub struct Classification<'a> {
     /// so there may be up to logprobs+1 elements in the response.
     /// The maximum value for logprobs is 5.
     /// If you need more than this, please contact support@openai.com and describe your use case.
-    pub logprobs: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub logprobs: Option<u32>,
 
     /// The maximum number of examples to be ranked by Search when using file.
     /// Setting it to a higher value leads to improved accuracy but with increased latency and cost.
-    pub max_examples: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_examples: Option<u32>,
 
     /// Modify the likelihood of specified tokens appearing in the completion.
     /// Accepts a json object that maps tokens (specified by their token ID in the GPT tokenizer)
@@ -58,41 +66,50 @@ pub struct Classification<'a> {
     /// will vary per model, but values between -1 and 1 should decrease or increase likelihood
     /// of selection; values like -100 or 100 should result in a ban or exclusive selection
     /// of the relevant token.
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
     pub logit_bias: HashMap<Cow<'a, str>, i32>,
 
     /// If set to true, the returned JSON will include a "prompt" field containing the final prompt
     /// that was used to request a completion. This is mainly useful for debugging purposes.
-    pub return_prompt: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub return_prompt: Option<bool>,
 
     /// A special boolean flag for showing metadata. If set to true, each document entry in the
     /// returned JSON will contain a "metadata" field. This flag only takes effect when file is set.
-    pub return_metadata: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub return_metadata: Option<bool>,
 
     /// If set to true, the returned JSON will include a "prompt" field containing the final prompt
     /// that was used to request a completion. This is mainly useful for debugging purposes.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub expand: Vec<Cow<'a, str>>,
 
     /// A unique identifier representing your end-user, which will help OpenAI to monitor and detect abuse.
-    pub user: Cow<'a, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user: Option<Cow<'a, str>>,
 }
 
 impl Default for Classification<'_> {
     fn default() -> Self {
         Self {
-            model: Model::Davinci,
+            model: None,
             query: Cow::Borrowed(""),
             examples: vec![],
             file: None,
             labels: vec![],
-            search_model: Model::default(),
-            temperature: 0.,
-            logprobs: 0,
-            max_examples: 200,
+            search_model: None,
+
+            temperature: None,
+
+            logprobs: None,
+            max_examples: None,
+
             logit_bias: HashMap::new(),
-            return_prompt: false,
-            return_metadata: false,
-            expand: Vec::new(),
-            user: Cow::Borrowed("")
+
+            return_prompt: None,
+            return_metadata: None,
+            expand: vec![],
+            user: None
         }
     }
 }
@@ -104,6 +121,7 @@ impl Endpoint for Classification<'_> {
         let serialized = serde_json::to_string(self)
             .expect("Failed to serialize Classification");
         let endpoint = Self::ENDPOINT.to_owned();
+        trace!("endpoint={}, serialized={}", endpoint, serialized);
 
         super::request::post!(endpoint, auth_token, serialized)
     }

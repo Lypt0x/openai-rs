@@ -57,7 +57,7 @@ pub struct Completion<'a> {
 
     /// Up to 4 sequences where the API will stop generating further tokens.
     /// The returned text will not contain the stop sequence.
-    pub stop: Option<[char; 4]>,
+    pub stop: Option<Vec<Cow<'a, str>>>,
 
     /// Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they
     /// appear in the text so far, increasing the model's likelihood to talk about new topics.

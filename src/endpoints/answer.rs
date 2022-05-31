@@ -58,7 +58,7 @@ pub struct Answer<'a> {
 
     /// Up to 4 sequences where the API will stop generating further tokens.
     /// The returned text will not contain the stop sequence.
-    pub stop: Option<[char; 4]>,
+    pub stop: Option<Vec<Cow<'a, str>>>,
 
     /// How many answers to generate for each question.
     pub n: u32,
@@ -122,6 +122,8 @@ impl Endpoint for Answer<'_> {
         let serialized = serde_json::to_string(&self)
             .expect("Failed to serialize Answer");
         let endpoint = Self::ENDPOINT.to_owned();
+        trace!("endpoint={}, serialized={}", endpoint, serialized);
+
 
         super::request::post!(endpoint, auth_token, serialized)
     }
