@@ -6,7 +6,7 @@ license = "MIT"
 keywords = ["openai", "ai", "neural", "genetic", "evolutionary"]
 description = "A Rust implementation of OpenAI"
 documentation = "https://docs.rs/openai-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 exclude = [
     ".idea/*",
