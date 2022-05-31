@@ -13,7 +13,7 @@ pub struct Search<'a> {
     /// Up to 200 documents to search over, provided as a list of strings.
     /// The maximum document length (in tokens) is 2034 minus the number of tokens in the query.
     /// You should specify either documents or a file, but not both.
-    pub documents: Vec<String>,
+    pub documents: Vec<Cow<'a, str>>,
 
     /// The ID of an uploaded file that contains documents to search over.
     /// You should specify either documents or a file, but not both.

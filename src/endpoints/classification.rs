@@ -19,7 +19,7 @@ pub struct Classification<'a> {
     /// `[["The movie is so interesting.", "Positive"], ["It is quite boring.", "Negative"], ...]`
     /// All the label strings will be normalized to be capitalized.
     /// You should specify either examples or file, but not both.
-    pub examples: Option<Vec<Vec<String>>>,
+    pub examples: Vec<[Cow<'a, str>; 2]>,
 
     /// The ID of the uploaded file that contains training examples.
     /// See upload file for how to upload a file of the desired format and purpose.
@@ -29,7 +29,7 @@ pub struct Classification<'a> {
     /// The set of categories being classified. If not specified, candidate labels will be
     /// automatically collected from the examples you provide. All the label strings will be
     /// normalized to be capitalized.
-    pub labels: Vec<String>,
+    pub labels: Vec<Cow<'a, str>>,
 
     /// ID of the engine to use for Search. You can select one of ada, babbage, curie, or davinci
     pub search_model: Model,
@@ -70,7 +70,7 @@ pub struct Classification<'a> {
 
     /// If set to true, the returned JSON will include a "prompt" field containing the final prompt
     /// that was used to request a completion. This is mainly useful for debugging purposes.
-    pub expand: Vec<String>,
+    pub expand: Vec<Cow<'a, str>>,
 
     /// A unique identifier representing your end-user, which will help OpenAI to monitor and detect abuse.
     pub user: Cow<'a, str>,
@@ -81,7 +81,7 @@ impl Default for Classification<'_> {
         Self {
             model: Model::Davinci,
             query: Cow::Borrowed(""),
-            examples: None,
+            examples: vec![],
             file: None,
             labels: vec![],
             search_model: Model::default(),
