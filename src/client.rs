@@ -13,6 +13,37 @@ pub struct Client {
 }
 
 impl Client {
+    /// Returns a new response from the OpenAI API.
+    ///
+    /// # Arguments
+    ///
+    /// * `engine_id` - The engine id to use. Due to few endpoints this can be optional.
+    /// * `model` - The model to use. Each Model in the endpoints module is a corresponding model.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use std::borrow::Cow;
+    /// use openai_rs::client::Client;
+    /// use openai_rs::endpoints::edits::Edit;
+    /// use openai_rs::endpoints::{Response, ResponseError};
+    /// use openai_rs::openai;
+    ///
+    /// // Create the Client with your API key.
+    /// let client: Client = openai::new("api_key");
+    ///
+    /// // Create the Edit struct with the input and instruction.
+    /// let edit = Edit {
+    ///      input: Cow::Borrowed("What day of the wek is it?"),
+    ///      instruction: Cow::Borrowed("Fix the spelling mistakes"),
+    ///      ..Default::default()
+    ///  };
+    ///
+    /// // Send the request to the OpenAI API.
+    /// let response: Result<Response, ResponseError> = client.create(
+    ///     Some("text-davinci-edit-001"), &edit
+    /// ).await;
+    /// ```
     pub async fn create<T>(
         &self,
         engine_id: Option<&str>,
