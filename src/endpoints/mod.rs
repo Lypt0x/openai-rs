@@ -3,9 +3,6 @@ use std::io::Error;
 
 pub mod completion;
 pub mod classification;
-pub mod code;
-pub mod embeddings;
-pub mod finetuning;
 pub mod answer;
 pub mod search;
 pub mod edits;
