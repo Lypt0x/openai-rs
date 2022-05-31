@@ -15,7 +15,7 @@ pub struct Client {
 impl Client {
     pub async fn create<T>(
         &self,
-        engine_id: &str,
+        engine_id: Option<&str>,
         model: &T
     ) -> Result<Response, ResponseError>
         where T: Endpoint {
