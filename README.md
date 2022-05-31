@@ -34,5 +34,5 @@ OpenAI library made in Rust
  ```
 
  # Requirements
- * An api key at [OpenAI API](https://openai.com/api-docs/) for the Client.
+ * An api key at [OpenAI API](https://openai.com/api/) for the Client.
  * An async runtime like [tokio](https://tokio.rs) in order to use the async functions.
