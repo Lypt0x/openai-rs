@@ -6,6 +6,10 @@ license = "MIT"
 keywords = ["openai", "rs", "rust", "ai", "neural", "network", "neat", "genetic", "evolutionary", "algorithm"]
 version = "0.1.0"
 edition = "2021"
+exclude = [
+    ".idea/*",
+    "openai-rs.iml",
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
